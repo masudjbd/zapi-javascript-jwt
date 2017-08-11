@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JWT generator javascript</title>
+    <script type="text/javascript" src="crypto-js/src/core.js"></script>
+    <script type="text/javascript" src="crypto-js/src/sha256.js"></script>
+    <script type="text/javascript" src="crypto-js/src/hmac.js"></script>
+    <script type="text/javascript" src="crypto-js/src/enc-base64.js"></script>
+
+        <script type="text/javascript">
+
+            function generateJWT(){
+
+                //set credentials
+                var BASE_URL = document.getElementById("baseUrl").value;
+                var ACCESS_KEY = document.getElementById("accessKey").value;
+                var SECRET_KEY = document.getElementById("secretKey").value
+                var USER = document.getElementById("userName").value;
+
+                //Get List of Cycles
+                var METHOD = document.getElementById("method").value;
+                var API_URI = document.getElementById("apiURI").value;
+                var JWT_EXPIRE = document.getElementById("jwtExpire").value | 3600;
+                if(API_URI) {
+                    var RELATIVE_PATH = API_URI.split(BASE_URL)[1].split("?")[0];
+                    var QUERY_STRING = API_URI.split(BASE_URL)[1].split("?")[1];
+                    var CANONICAL_PATH;
+                    if (QUERY_STRING) {
+                        CANONICAL_PATH = METHOD + '&' + RELATIVE_PATH + '&' + QUERY_STRING;
+                    } else {
+                        CANONICAL_PATH = METHOD + '&' + RELATIVE_PATH + '&';
+                    }
+                }else{
+                    return;
+                }
+
+                var header = {
+                    "alg": "HS256",
+                    "typ": "JWT"
+                };
+
+                var jwt_payload = {
+                    'sub': USER,
+                    'qsh': CryptoJS.SHA256(CANONICAL_PATH).toString(),
+                    'iss': ACCESS_KEY,
+                    'exp': new Date().getTime()+JWT_EXPIRE,
+                    'iat': new Date().getTime()
+                }
+
+
+
+                var stringifiedHeader = CryptoJS.enc.Utf8.parse(JSON.stringify(header));
+                var encodedHeader = base64url(stringifiedHeader);
+
+
+
+                var stringifiedData = CryptoJS.enc.Utf8.parse(JSON.stringify(jwt_payload));
+                var encodedData = base64url(stringifiedData);
+
+                var token = encodedHeader + "." + encodedData;
+
+
+                var signature = CryptoJS.HmacSHA256(token, SECRET_KEY);
+                signature = base64url(signature);
+
+                var signedToken = token + "." + signature;
+
+                document.getElementById("token").innerHTML=signedToken;
+
+
+            }
+
+
+            function base64url(source) {
+                // Encode in classical base64
+                encodedSource = CryptoJS.enc.Base64.stringify(source);
+
+                // Remove padding equal characters
+                encodedSource = encodedSource.replace(/=+$/, '');
+
+                // Replace characters according to base64url specifications
+                encodedSource = encodedSource.replace(/\+/g, '-');
+                encodedSource = encodedSource.replace(/\//g, '_');
+
+                return encodedSource;
+            }
+        </script>
+
+    <!-- the following link and script is to design form el -->
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="jumbotron">
+        <h1 class="display-3">JWT Generator for ZAPI</h1>
+    </div>
+
+    <form action="#">
+
+        <div class="form-group">
+            <label for="baseUrl">Base URL</label>
+            <input type="text" class="form-control" id="baseUrl"  />
+            <small id="baseUrlHelp" class="form-text text-muted">e.g: https://c505465a.ngrok.io</small>
+        </div>
+
+        <div class="form-group">
+            <label for="userName">User Name</label>
+            <input type="text" class="form-control" id="userName"  />
+            <small id="userNameHelp" class="form-text text-muted">e.g: admin</small>
+        </div>
+
+        <div class="form-group">
+            <label for="accessKey">Access Key</label>
+            <input type="text" class="form-control" id="accessKey"  />
+            <small id="accessKeyHelp" class="form-text text-muted">e.g: NzgzNmExMWYtNWI4YS0zYmIyLWI2MmEtMzQ1ZTExOTU5MGQyIGFkbWluIFVTRVJfREVGQVVMVF9OQU1F</small>
+        </div>
+
+        <div class="form-group">
+            <label for="secretKey">Secret Key</label>
+            <input type="text" class="form-control" id="secretKey"   />
+            <small id="secretKeyHelp" class="form-text text-muted">e.g: BaZmvGPS5y4hJ_MQYcudbayV7Xb7cza6VsX8vEEwduo</small>
+        </div>
+
+        <div class="form-group">
+            <label for="method">HTTP Method</label>
+            <input type="text" class="form-control" id="method"  />
+            <small id="methodHelp" class="form-text text-muted">e.g: GET</small>
+        </div>
+
+        <div class="form-group">
+            <label for="apiURI">API URI</label>
+            <input type="text" class="form-control" id="apiURI"  />
+            <small id="apiURIHelp" class="form-text text-muted">e.g: https://c505465a.ngrok.io/public/rest/api/1.0/cycles/search?projectId=10000&versionId=10000</small>
+        </div>
+
+        <div class="form-group">
+            <label for="jwtExpire">JWT Expire</label>
+            <input type="text" class="form-control" id="jwtExpire"  />
+            <small id="jwtExpireHelp" class="form-text text-muted">e.g(in ms): 3600</small>
+        </div>
+
+
+        <div class="form-group">
+            <label for="token">Generated Token</label>
+            <textarea class="form-control" id="token" rows="3"></textarea>
+        </div>
+
+
+        <button type="button" onclick="generateJWT()" class="btn btn-primary">Generate JWT</button>
+    </form>
+
+    <br />
+    <br />
+    <br />
+
+    <p class="text-muted" id="copyright">&copy; 2017 Masudur Rahman &lt;masud[dot]java[at]gmail[dot]com&gt;</p>
+</div>
+</body>
+</html>
