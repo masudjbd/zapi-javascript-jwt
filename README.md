@@ -1,6 +1,4 @@
-# zapi-javascript-jwt
-
-## Create JWT for JWT Authentication
+## Create JavaScript JWT for JWT Authentication
 
 - Create JWT token by using javascript.
 
@@ -24,3 +22,6 @@ and click to [Generate JWT]
 
 `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInFzaCI6IjE2NGU5MjI2OGRhNGU5NjI2NTM3ZjFmNTcyM2ZmYTJjNGExOGQ0YjVjYjQ2N2I4Y2ZlOTE1NGMzOTczMTEwMmEiLCJpc3MiOiJaak01TldJelpqWXRZemM1T1MwelpqVTVMV0UwWkdRdE5EUmhOVEpqTmpFNVpETTNJR0ZrYldsdUlGVlRSVkpmUkVWR1FWVk1WRjlPUVUxRiIsImV4cCI6MTUwMjQ4OTkyNzczNiwiaWF0IjoxNTAyNDg5OTI0MTM2fQ.wYpGdrvngrxpLEe3UKubPqhoET2cgy8lH-5GTEveoP4`
 
+
+## Additional Library Used:
+- [CryptoJS](https://github.com/brix/crypto-js.git)
